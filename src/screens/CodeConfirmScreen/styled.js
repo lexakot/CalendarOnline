@@ -7,41 +7,40 @@ export const Container = styled.View`
   padding: 0 28px;
 `;
 
-export const InputContainer = styled.View`
-  margin-top: 40px;
+export const CodeInput = styled.TextInput`
+  border-bottom-width: 1px;
+  padding-bottom: 8px;
+  border-color: ${({error}) =>
+    !error ? 'rgba(22,36,61, 0.1)' : 'rgba(242, 84, 73, 0.5)'};
+  margin-left: 8px;
+  width: 108px;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 20px;
+  color: #16243d;
+`;
+
+export const ErrorText = styled.Text`
+  margin-top: 16px;
+  color: #f25449;
+  font-size: 14px;
+`;
+
+export const ButtonsContainer = styled.View`
   width: 100%;
   flex-direction: row;
-  justify-content: center;
+  justify-content: flex-end;
+  margin-top: 50px;
 `;
 
-export const CountryPicker = styled.TouchableOpacity`
-  border-bottom-width: 1px;
-  padding-bottom: 8px;
-  border-color: 'rgba(22,36,61, 0.1)';
+export const Button = styled.TouchableOpacity``;
+
+export const ButtonText = styled.Text`
+  color: #4a70bf;
+  font-weight: 700;
 `;
 
-export const InputText = styled.Text`
-  font-style: normal;
-  font-weight: 600;
-  font-size: 20px;
-  color: #16243d;
-`;
-
-export const CodeInput = styled.View`
-  border-bottom-width: 1px;
-  padding-bottom: 8px;
-  border-color: 'rgba(22,36,61, 0.1)';
-  margin-left: 8px;
-`;
-
-export const PhoneInput = styled.TextInput`
-  border-bottom-width: 1px;
-  padding-bottom: 8px;
-  border-color: 'rgba(22,36,61, 0.1)';
-  margin-left: 8px;
-  width: 128px;
-  font-style: normal;
-  font-weight: 600;
-  font-size: 20px;
-  color: #16243d;
+export const ResendText = styled.Text`
+  color: #4a70bf;
+  font-size: 14px;
 `;

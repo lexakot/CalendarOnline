@@ -69,17 +69,17 @@ class CalendarComponent extends React.Component {
     console.log(this.state);
     return (
       <>
-        <RN.Button
+        {/* <RN.Button
           onPress={() => this.setState({current: '2018-04-01'})}
           title="123"
-        />
+        /> */}
         <Calendar
           renderHeader={this.renderHeader}
           current={this.state.current}
           markingType={'custom'}
           hideArrows
           style={{
-            paddingTop: 100
+            paddingTop: 20
           }}
           // markedDates={{
           //   '2021-05-16': {

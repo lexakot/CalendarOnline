@@ -22,3 +22,14 @@ export const Title = styled.Text`
   text-align: center;
   color: #ffffff;
 `;
+
+export const BackButton = styled.TouchableOpacity`
+  width: 28px;
+  z-index: 1111;
+  height: 28px;
+  left: 20px;
+  bottom: 20px;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+`;

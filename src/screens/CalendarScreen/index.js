@@ -1,14 +1,12 @@
-import React, {useCallback, useMemo, useRef} from 'react';
-import {Text} from 'react-native';
+import React, {useCallback, useMemo} from 'react';
 import BottomSheet from '@gorhom/bottom-sheet';
 import Calendar from '../../components/Calendar';
 
 import * as S from './styled';
 
 export const CalendarScreen = () => {
-
   // variables
-  const snapPoints = useMemo(() => ['45%', '67%'], []);
+  const snapPoints = useMemo(() => ['30%', '67%'], []);
 
   // callbacks
   const handleSheetChanges = useCallback(index => {
