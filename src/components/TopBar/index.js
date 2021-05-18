@@ -5,7 +5,12 @@ import LeftArrowIcon from '../../assets/icons/left-arrow.svg';
 
 import * as S from './styled';
 
-const TopBar = ({title = '', withBackButton = false}) => {
+const TopBar = ({
+  title = '',
+  withBackButton = false,
+  withRightButton = false,
+  renderRightButton = () => {},
+}) => {
   const navigation = useNavigation();
   return (
     <S.Container>
@@ -15,6 +20,9 @@ const TopBar = ({title = '', withBackButton = false}) => {
         </S.BackButton>
       ) : null}
       <S.Title>{title}</S.Title>
+      {withRightButton ? (
+        <S.RightButton>{renderRightButton()}</S.RightButton>
+      ) : null}
     </S.Container>
   );
 };

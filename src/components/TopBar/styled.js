@@ -33,3 +33,14 @@ export const BackButton = styled.TouchableOpacity`
   align-items: center;
   position: absolute;
 `;
+
+export const RightButton = styled.TouchableOpacity`
+  width: 28px;
+  z-index: 1111;
+  height: 28px;
+  right: 20px;
+  bottom: 20px;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+`;
