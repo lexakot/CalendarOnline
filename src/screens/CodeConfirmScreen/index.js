@@ -1,17 +1,22 @@
 import React from 'react';
 import {Keyboard, StyleSheet, Text, View} from 'react-native';
 import CountDown from 'react-native-countdown-component';
+import {connect} from 'react-redux';
+
+import {loginRequest} from '../../redux/auth';
 
 import {Title, SubTitle} from '../../components/common';
 import TopBar from '../../components/TopBar';
 
 import * as S from './styled';
 
-const CodeConfirmScreen = ({navigation}) => {
+const CodeConfirmScreen = ({navigation, route, code: codeFromStore, loginRequest}) => {
   const [keyboardShow, setKeyboardShow] = React.useState(false);
   const [isResendActive, setResendActive] = React.useState(false);
   const [error, setError] = React.useState(false);
   const [code, setCode] = React.useState('');
+
+  const {phone} = route.params;
 
   React.useEffect(() => {
     Keyboard.addListener('keyboardDidShow', keyboardDidShow);
@@ -27,7 +32,8 @@ const CodeConfirmScreen = ({navigation}) => {
   const keyboardDidShow = () => setKeyboardShow(true);
 
   const goTabNavigation = () => {
-    if (code !== '00000') {
+    console.log('codeFromStore', codeFromStore);
+    if (code !== codeFromStore) {
       setError(true);
       return;
     }
@@ -36,13 +42,14 @@ const CodeConfirmScreen = ({navigation}) => {
   };
 
   const resendCode = () => {
+    loginRequest(phone);
     setError(false);
     setResendActive(false);
   };
 
   return (
     <>
-      {!keyboardShow && <TopBar withBackButton title="+375 44 260 56 53" />}
+      {!keyboardShow && <TopBar withBackButton title={`+375 ${phone}`} />}
       <S.Container>
         <Title>SMS-подтверждение</Title>
         <SubTitle>
@@ -54,7 +61,7 @@ const CodeConfirmScreen = ({navigation}) => {
           value={code}
           onChangeText={text => setCode(text)}
           error={error}
-          maxLength={5}
+          maxLength={6}
           keyboardType="phone-pad"
         />
         {error && <S.ErrorText>Неправильный код подтверждения</S.ErrorText>}
@@ -118,4 +125,15 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CodeConfirmScreen;
+const mapDispatchToProps = {
+  loginRequest,
+};
+
+const mapStateToProps = ({auth}) => ({
+  code: auth.code,
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(CodeConfirmScreen);

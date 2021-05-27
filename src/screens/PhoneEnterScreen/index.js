@@ -1,12 +1,14 @@
 import React from 'react';
 import {Keyboard} from 'react-native';
+import {connect} from 'react-redux';
 
 import {Title, SubTitle} from '../../components/common';
 import TopBar from '../../components/TopBar';
+import {loginRequest} from '../../redux/auth';
 
 import * as S from './styled';
 
-const PhoneEnterScreen = ({navigation}) => {
+const PhoneEnterScreen = ({navigation, loginRequest}) => {
   const [keyboardShow, setKeyboardShow] = React.useState(false);
   const [phone, setPhone] = React.useState('');
 
@@ -23,9 +25,12 @@ const PhoneEnterScreen = ({navigation}) => {
   const keyboardDidHide = () => setKeyboardShow(false);
   const keyboardDidShow = () => setKeyboardShow(true);
 
-  const goToCodeConfirm = () => {
+  const goToCodeConfirm = async () => {
     if (phone.length === 9) {
-      navigation.navigate('CodeConfirm');
+      loginRequest(phone);
+      navigation.navigate('CodeConfirm', {
+        phone,
+      });
     }
   };
 
@@ -61,4 +66,11 @@ const PhoneEnterScreen = ({navigation}) => {
   );
 };
 
-export default PhoneEnterScreen;
+const mapDispatchToProps = {
+  loginRequest,
+};
+
+export default connect(
+  null,
+  mapDispatchToProps,
+)(PhoneEnterScreen);

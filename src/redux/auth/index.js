@@ -1,4 +1,6 @@
+import { Alert } from 'react-native';
 import {call, put, takeEvery} from 'redux-saga/effects';
+import http from '../../services/http';
 
 const LOGIN_REQUEST = 'auth/LOGIN_REQUEST';
 const LOGIN_SUCCESS = 'auth/LOGIN_SUCCESS';
@@ -15,6 +17,7 @@ const SEND_SMS_FAILURE = 'auth/SEND_SMS_FAILURE';
 export const initialState = {
   authenticated: false,
   loading: false,
+  code: '',
 };
 
 export default function reducer(state = initialState, action = {}) {
@@ -22,7 +25,7 @@ export default function reducer(state = initialState, action = {}) {
     case LOGIN_REQUEST:
       return {...state, loading: true};
     case LOGIN_SUCCESS:
-      return {...state, loading: false, authenticated: true};
+      return {...state, loading: false, authenticated: true, code: action.code};
     case LOGIN_FAILURE:
       return {...state, loading: false};
 
@@ -60,8 +63,16 @@ export const sendSmsRequest = payload => {
 // <<<WORKERS>>>
 function* login({payload}) {
   try {
-    console.log('login');
+    const {data} = yield call(http.post, '/Identity/getOTP', {
+      PhoneNumber: `375${payload}`,
+    });
+    alert(data.verify_token);
+    yield put({
+      type: LOGIN_SUCCESS,
+      code: data.verify_token,
+    });
   } catch (err) {
+    alert('Error');
     console.log('err', err);
   }
 }

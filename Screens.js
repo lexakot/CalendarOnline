@@ -22,7 +22,6 @@ console.disableYellowBox = true;
 const TabsNavigation = () => {
   return (
     <Tabs.Navigator tabBar={props => <TabBar {...props} />} headerMode="none">
-    {/* <Tabs.Navigator headerMode="none"> */}
       <Tabs.Screen name="Contacts" component={ContactsScreen} />
       <Tabs.Screen name="Calendar" component={CalendarScreen} />
     </Tabs.Navigator>
@@ -33,7 +32,7 @@ const Screens = () => {
   return (
     <Provider store={store}>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Tabs" headerMode="none">
+        <Stack.Navigator initialRouteName="PhoneEnter" headerMode="none">
           <Stack.Screen name="PhoneEnter" component={PhoneEnterScreen} />
           <Stack.Screen name="CodeConfirm" component={CodeConfirmScreen} />
           <Stack.Screen name="Tabs" component={TabsNavigation} />

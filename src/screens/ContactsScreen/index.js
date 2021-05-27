@@ -21,7 +21,7 @@ const Contact = ({contact}) => {
           <S.ContactLastname>{contact?.familyName} </S.ContactLastname>
           <S.ContactFirstname>{contact?.givenName}</S.ContactFirstname>
         </S.ContactNameContainer>
-        <S.ContactNumber>{contact?.phoneNumbers[0].number}</S.ContactNumber>
+        {/* <S.ContactNumber>{contact?.phoneNumbers[0].number}</S.ContactNumber> */}
       </S.ContactInfoContainer>
       <S.BookingButton>
         <S.BookingText>Запись</S.BookingText>
@@ -38,18 +38,20 @@ const ContactsScreen = () => {
 
   React.useEffect(() => {
     async function getContacts() {
-      const request = await PermissionsAndroid.request(
+      const request = await PermissionsAndroid.requestMultiple([
         PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
-        {
-          title: 'Contacts',
-          message: 'This app would like to view your contacts.',
-          buttonPositive: 'Please accept bare mortal',
-        },
-      );
+        PermissionsAndroid.PERMISSIONS.WRITE_CONTACTS,
+      ]);
 
-      if (request === 'granted') {
-        const res = await Contacts.getAll();
-        setContacts(res);
+      if (request['android.permission.READ_CONTACTS'] === 'granted') {
+        try {
+          const res = await Contacts.getAll();
+          setContacts(res);
+          console.log(res);
+          alert(JSON.stringify(res[0].phoneNumbers));
+        } catch (err) {
+          alert(err);
+        }
       } else {
         setPermissionsError(true);
       }
@@ -57,11 +59,15 @@ const ContactsScreen = () => {
     getContacts();
   }, [JSON.stringify(contacts)]);
 
-  const filterBySearchString = () =>
-    contacts.filter(c =>
-      c.displayName.toLowerCase().includes(searchString.toLowerCase()),
-    );
-
+  const filterBySearchString = () => {
+    if (!contacts.length) {
+      return [];
+    }
+    return contacts;
+    // return contacts.filter(c =>
+    //   c.displayName.toLowerCase().includes(searchString.toLowerCase()),
+    // );
+  };
   return (
     <S.Container>
       <TopBar
@@ -93,11 +99,13 @@ const ContactsScreen = () => {
       {!permissionsError && !filterBySearchString().length && (
         <S.ErrorText>Нет доступных контактов</S.ErrorText>
       )}
-      <S.ListContacts>
-        {filterBySearchString().map((contact, index) => (
-          <Contact contact={contact} key={index} />
-        ))}
-      </S.ListContacts>
+      {contacts.length ? (
+        <S.ListContacts>
+          {contacts.map((contact, index) => (
+            <Contact contact={contact} key={index} />
+          ))}
+        </S.ListContacts>
+      ) : null}
     </S.Container>
   );
 };

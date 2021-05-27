@@ -6,7 +6,7 @@ export const Container = styled.View`
   background-color: yellow;
 `;
 
-export const HeaderContainer = styled.View`
+export const HeaderContainer = styled.TouchableOpacity`
   width: 100%;
   height: 24px;
   flex-direction: row;

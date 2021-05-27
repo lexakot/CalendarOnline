@@ -7,18 +7,18 @@ import * as S from './styled';
 
 LocaleConfig.locales.ru = {
   monthNames: [
-    'Janvier',
-    'Février',
-    'Mars',
-    'Avril',
-    'Mai',
-    'Juin',
-    'Juillet',
-    'Août',
-    'Septembre',
-    'Octobre',
-    'Novembre',
-    'Décembre',
+    'Январь',
+    'Февралб',
+    'Март',
+    'Апрель',
+    'Май',
+    'Июнь',
+    'Июль',
+    'Август',
+    'Сентябрь',
+    'Октябрь',
+    'Ноябрь',
+    'Декабрь',
   ],
   monthNamesShort: [
     'Janv.',
@@ -48,55 +48,74 @@ LocaleConfig.locales.ru = {
 };
 LocaleConfig.defaultLocale = 'ru';
 
-const vacation = {key: 'vacation', color: 'red', selectedDotColor: 'red'};
-const massage = {key: 'massage', color: 'blue', selectedDotColor: 'red'};
-const workout = {key: 'workout', color: 'green'};
+const vacation = {key: 'vacation', dotColor: 'red', selectedDotColor: 'red'};
 
 class CalendarComponent extends React.Component {
-  calendarRef;
   state = {
-    current: '2012-03-01',
+    markedDates: {
+      '2021-05-18': {
+        dots: [vacation],
+        selected: true,
+        marked: true,
+        customStyles: {
+          container: {
+            backgroundColor: '#FFFFFF',
+            borderRadius: 8,
+          },
+          text: {
+            color: '#16243D',
+            fontWeight: 'bold',
+          },
+        },
+      },
+    },
   };
+  calendarRef;
 
-  renderHeader = () => {
+  renderHeader = e => {
     return (
-      <S.HeaderContainer>
-        <S.Month>Март</S.Month>
+      <S.HeaderContainer onPress={this.props.handleExpand}>
+        <S.Month>{e.toString('MMMM')}</S.Month>
       </S.HeaderContainer>
     );
-  }
+  };
+
+  selectdDay = e => {
+    console.log('day', e);
+    this.setState({
+      markedDates: {
+        [e.dateString]: {
+          dots: [vacation],
+          marked: true,
+          selected: true,
+          customStyles: {
+            container: {
+              backgroundColor: '#FFFFFF',
+              borderRadius: 8,
+            },
+            text: {
+              color: '#16243D',
+              fontWeight: 'bold',
+            },
+          },
+        },
+      }
+    })
+  };
   render() {
     console.log(this.state);
     return (
       <>
-        {/* <RN.Button
-          onPress={() => this.setState({current: '2018-04-01'})}
-          title="123"
-        /> */}
         <Calendar
+          enableSwipeMonths
           renderHeader={this.renderHeader}
-          current={this.state.current}
           markingType={'custom'}
           hideArrows
           style={{
-            paddingTop: 20
+            paddingTop: 20,
           }}
-          // markedDates={{
-          //   '2021-05-16': {
-          //     dots: [vacation, massage, workout],
-          //     selected: true,
-          //     customStyles: {
-          //       container: {
-          //         backgroundColor: '#FFFFFF',
-          //         borderRadius: 8,
-          //       },
-          //       text: {
-          //         color: '#16243D',
-          //         fontWeight: 'bold',
-          //       },
-          //     },
-          //   },
-          // }}
+          onDayPress={this.selectdDay}
+          markedDates={this.state.markedDates}
           theme={{
             backgroundColor: 'yellow',
             calendarBackground: '#4A70BF',
@@ -104,6 +123,8 @@ class CalendarComponent extends React.Component {
             todayTextColor: 'red',
             textDisabledColor: 'rgba(255, 255, 255, 0.4)',
             textSectionTitleColor: 'white',
+            dotColor: 'red',
+            selectedDotColor: '#4C79D9',
             // textSectionTitleDisabledColor: '#d9e1e8',
             // selectedDayBackgroundColor: '#00adf5',
             // selectedDayTextColor: '#ffffff',
