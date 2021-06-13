@@ -8,9 +8,12 @@ import SearchIcon from '../../assets/icons/search.svg';
 import RightArrowIcon from '../../assets/icons/right-arrow.svg';
 import UserPlusIcon from '../../assets/icons/user-plus.svg';
 
+import TokenStorage from '../../services/storage/token';
+
 import TopBar from '../../components/TopBar';
 
 import * as S from './styled';
+import axios from 'axios';
 
 const Contact = ({contact}) => {
   return (
@@ -21,7 +24,7 @@ const Contact = ({contact}) => {
           <S.ContactLastname>{contact?.familyName} </S.ContactLastname>
           <S.ContactFirstname>{contact?.givenName}</S.ContactFirstname>
         </S.ContactNameContainer>
-        {/* <S.ContactNumber>{contact?.phoneNumbers[0].number}</S.ContactNumber> */}
+        <S.ContactNumber>{contact?.phoneNumbers[0].number}</S.ContactNumber>
       </S.ContactInfoContainer>
       <S.BookingButton>
         <S.BookingText>Запись</S.BookingText>
@@ -33,8 +36,32 @@ const Contact = ({contact}) => {
 const ContactsScreen = () => {
   const [tabSelected, setTabSelected] = React.useState(0);
   const [contacts, setContacts] = React.useState([]);
+  const [syncContacts, setSyncContacts] = React.useState([]);
   const [permissionsError, setPermissionsError] = React.useState(false);
   const [searchString, setSearchString] = React.useState('');
+
+  const renderListOfContacts = () => {
+    if (permissionsError) {
+      return <S.ErrorText>Дайте разрешение приложению</S.ErrorText>;
+    }
+
+    const contactsToTabSelected = tabSelected === 1 ? contacts : syncContacts;
+    const contactsToDisplay = contactsToTabSelected.filter(c =>
+      c.displayName.toLowerCase().includes(searchString.toLowerCase()),
+    );
+
+    if (!contactsToDisplay.length && !permissionsError) {
+      return <S.ErrorText>Нет доступных контактов</S.ErrorText>;
+    }
+
+    return (
+      <S.ListContacts>
+        {contactsToDisplay.map((contact, index) => (
+          <Contact contact={contact} key={index} />
+        ))}
+      </S.ListContacts>
+    );
+  };
 
   React.useEffect(() => {
     async function getContacts() {
@@ -46,7 +73,43 @@ const ContactsScreen = () => {
       if (request['android.permission.READ_CONTACTS'] === 'granted') {
         try {
           const res = await Contacts.getAll();
-          setContacts(res);
+
+          const formatted = res.map(c => ({
+            ...c,
+            formattedPhone: c.phoneNumbers[0].number
+              .replace(/\s/g, '')
+              .replaceAll('+', '')
+              .replaceAll('-', ''),
+          }));
+
+          const phoneNumbers = formatted.map(c => c.formattedPhone);
+          console.log(phoneNumbers);
+
+          const token = await TokenStorage.get();
+          const config = {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          };
+          const {data} = await axios.post(
+            'http://82.146.48.248:90/api/Contacts/get-contacts',
+            phoneNumbers,
+            config,
+          );
+          console.log('data', data);
+
+          const findSyncContacts = formatted
+            .map(c => {
+              const f = data.find(t => t.PhoneNumber === c.formattedPhone);
+              if (f.IsExisted) {
+                return c;
+              }
+            })
+            .filter(k => k !== undefined);
+          console.log('findSyncContacts', findSyncContacts);
+          setSyncContacts(findSyncContacts);
+          setContacts(formatted);
         } catch (err) {
           alert(err);
         }
@@ -57,15 +120,6 @@ const ContactsScreen = () => {
     getContacts();
   }, [JSON.stringify(contacts)]);
 
-  const filterBySearchString = () => {
-    if (!contacts.length) {
-      return [];
-    }
-    return contacts;
-    // return contacts.filter(c =>
-    //   c.displayName.toLowerCase().includes(searchString.toLowerCase()),
-    // );
-  };
   return (
     <S.Container>
       <TopBar
@@ -91,19 +145,7 @@ const ContactsScreen = () => {
           placeholder="Поиск"
         />
       </S.SearchInputContainer>
-      {permissionsError && (
-        <S.ErrorText>Дайте разрешение приложению</S.ErrorText>
-      )}
-      {!permissionsError && !filterBySearchString().length && (
-        <S.ErrorText>Нет доступных контактов</S.ErrorText>
-      )}
-      {contacts.length ? (
-        <S.ListContacts>
-          {contacts.map((contact, index) => (
-            <Contact contact={contact} key={index} />
-          ))}
-        </S.ListContacts>
-      ) : null}
+      {renderListOfContacts()}
     </S.Container>
   );
 };

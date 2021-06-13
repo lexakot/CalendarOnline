@@ -5,11 +5,12 @@ import Contacts from 'react-native-contacts';
 import SearchIcon from '../../../../assets/icons/search.svg';
 import CheckIcon from '../../../../assets/icons/check-mark.svg';
 import BottomModal from '../../../../components/BottomModal';
+import TokenStorage from '../../../../services/storage/token';
 
 import * as S from './styled';
+import axios from 'axios';
 
 const Contact = ({contact, onContactPress, selectedContacts}) => {
-  console.log('selectedContacts', selectedContacts);
   return (
     <S.ContactContainer onPress={onContactPress}>
       <S.ContactAvatar source={{uri: contact.thumbnailPath}} />
@@ -21,22 +22,57 @@ const Contact = ({contact, onContactPress, selectedContacts}) => {
         <S.ContactNumber>{contact?.phoneNumbers[0].number}</S.ContactNumber>
       </S.ContactInfoContainer>
       <S.BookingButton
-        isChecked={selectedContacts.find(c => c.displayName === contact.displayName)}>
+        isChecked={selectedContacts.find(
+          c => c.displayName === contact.displayName,
+        )}>
         <CheckIcon />
       </S.BookingButton>
     </S.ContactContainer>
   );
 };
 
-const ContactModal = ({visible, close, selectedContacts, setSelectedContacts}) => {
+const ContactModal = ({
+  visible,
+  close,
+  selectedContacts,
+  setSelectedContacts,
+}) => {
   const [tabSelected, setTabSelected] = React.useState(0);
   const [searchString, setSearchString] = React.useState('');
   const [contacts, setContacts] = React.useState([]);
+  const [syncContacts, setSyncContacts] = React.useState([]);
   const [permissionsError, setPermissionsError] = React.useState(false);
-  // const [selectedContacts, setSelectedContacts] = React.useState([]);
 
   const addContact = contact => {
     setSelectedContacts([...selectedContacts, contact]);
+  };
+
+  const renderListOfContacts = () => {
+    if (permissionsError) {
+      return <S.ErrorText>Дайте разрешение приложению</S.ErrorText>;
+    }
+
+    const contactsToTabSelected = tabSelected === 1 ? contacts : syncContacts;
+    const contactsToDisplay = contactsToTabSelected.filter(c =>
+      c.displayName.toLowerCase().includes(searchString.toLowerCase()),
+    );
+
+    if (!contactsToDisplay.length && !permissionsError) {
+      return <S.ErrorText>Нет доступных контактов</S.ErrorText>;
+    }
+
+    return (
+      <S.ListContacts>
+        {contactsToDisplay.map((contact, index) => (
+          <Contact
+            onContactPress={() => addContact(contact)}
+            selectedContacts={selectedContacts}
+            contact={contact}
+            key={index}
+          />
+        ))}
+      </S.ListContacts>
+    );
   };
 
   React.useEffect(() => {
@@ -49,8 +85,43 @@ const ContactModal = ({visible, close, selectedContacts, setSelectedContacts}) =
       if (request['android.permission.READ_CONTACTS'] === 'granted') {
         try {
           const res = await Contacts.getAll();
-          setContacts(res);
-          console.log(res);
+
+          const formatted = res.map(c => ({
+            ...c,
+            formattedPhone: c.phoneNumbers[0].number
+              .replace(/\s/g, '')
+              .replaceAll('+', '')
+              .replaceAll('-', ''),
+          }));
+
+          const phoneNumbers = formatted.map(c => c.formattedPhone);
+          console.log(phoneNumbers);
+
+          const token = await TokenStorage.get();
+          const config = {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          };
+          const {data} = await axios.post(
+            'http://82.146.48.248:90/api/Contacts/get-contacts',
+            phoneNumbers,
+            config,
+          );
+          console.log('data', data);
+
+          const findSyncContacts = formatted
+            .map(c => {
+              const f = data.find(t => t.PhoneNumber === c.formattedPhone);
+              if (f.IsExisted) {
+                return c;
+              }
+            })
+            .filter(k => k !== undefined);
+          console.log('findSyncContacts', findSyncContacts, formatted);
+          setSyncContacts(findSyncContacts);
+          setContacts(formatted);
         } catch (err) {
           alert(err);
         }
@@ -90,18 +161,7 @@ const ContactModal = ({visible, close, selectedContacts, setSelectedContacts}) =
             placeholder="Поиск"
           />
         </S.SearchInputContainer>
-        {contacts.length ? (
-          <S.ListContacts>
-            {contacts.map((contact, index) => (
-              <Contact
-                onContactPress={() => addContact(contact)}
-                selectedContacts={selectedContacts}
-                contact={contact}
-                key={index}
-              />
-            ))}
-          </S.ListContacts>
-        ) : null}
+        {renderListOfContacts()}
       </S.Container>
     </BottomModal>
   );
