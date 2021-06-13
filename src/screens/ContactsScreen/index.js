@@ -1,7 +1,6 @@
-import {useFocusEffect} from '@react-navigation/native';
 import React from 'react';
 
-import {PermissionsAndroid} from 'react-native';
+import {PermissionsAndroid, FlatList} from 'react-native';
 import Contacts from 'react-native-contacts';
 
 import SearchIcon from '../../assets/icons/search.svg';
@@ -55,11 +54,13 @@ const ContactsScreen = () => {
     }
 
     return (
-      <S.ListContacts>
-        {contactsToDisplay.map((contact, index) => (
-          <Contact contact={contact} key={index} />
-        ))}
-      </S.ListContacts>
+      <FlatList
+        data={contactsToDisplay}
+        renderItem={({item, index}) => <Contact contact={item} key={index} />}
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+        }}
+      />
     );
   };
 
@@ -73,17 +74,16 @@ const ContactsScreen = () => {
       if (request['android.permission.READ_CONTACTS'] === 'granted') {
         try {
           const res = await Contacts.getAll();
-
-          const formatted = res.map(c => ({
+          const filtered = res.filter(c => c.phoneNumbers.length);
+          const formatted = filtered.map(c => ({
             ...c,
             formattedPhone: c.phoneNumbers[0].number
               .replace(/\s/g, '')
-              .replaceAll('+', '')
-              .replaceAll('-', ''),
+              .replace('+', '')
+              .replace(new RegExp('-', 'g'), ''),
           }));
 
           const phoneNumbers = formatted.map(c => c.formattedPhone);
-          console.log(phoneNumbers);
 
           const token = await TokenStorage.get();
           const config = {
@@ -102,7 +102,7 @@ const ContactsScreen = () => {
           const findSyncContacts = formatted
             .map(c => {
               const f = data.find(t => t.PhoneNumber === c.formattedPhone);
-              if (f.IsExisted) {
+              if (f?.IsExisted) {
                 return c;
               }
             })

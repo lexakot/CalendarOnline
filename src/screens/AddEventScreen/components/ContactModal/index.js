@@ -1,5 +1,5 @@
 import React from 'react';
-import {PermissionsAndroid} from 'react-native';
+import {FlatList, PermissionsAndroid} from 'react-native';
 import Contacts from 'react-native-contacts';
 
 import SearchIcon from '../../../../assets/icons/search.svg';
@@ -62,16 +62,20 @@ const ContactModal = ({
     }
 
     return (
-      <S.ListContacts>
-        {contactsToDisplay.map((contact, index) => (
+      <FlatList
+        data={contactsToDisplay}
+        renderItem={({item, index}) => (
           <Contact
-            onContactPress={() => addContact(contact)}
+            onContactPress={() => addContact(item)}
             selectedContacts={selectedContacts}
-            contact={contact}
+            contact={item}
             key={index}
           />
-        ))}
-      </S.ListContacts>
+        )}
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+        }}
+      />
     );
   };
 
@@ -85,17 +89,16 @@ const ContactModal = ({
       if (request['android.permission.READ_CONTACTS'] === 'granted') {
         try {
           const res = await Contacts.getAll();
-
-          const formatted = res.map(c => ({
+          const filtered = res.filter(c => c.phoneNumbers.length);
+          const formatted = filtered.map(c => ({
             ...c,
             formattedPhone: c.phoneNumbers[0].number
               .replace(/\s/g, '')
-              .replaceAll('+', '')
-              .replaceAll('-', ''),
+              .replace('+', '')
+              .replace(new RegExp('-', 'g'), ''),
           }));
 
           const phoneNumbers = formatted.map(c => c.formattedPhone);
-          console.log(phoneNumbers);
 
           const token = await TokenStorage.get();
           const config = {
@@ -114,12 +117,12 @@ const ContactModal = ({
           const findSyncContacts = formatted
             .map(c => {
               const f = data.find(t => t.PhoneNumber === c.formattedPhone);
-              if (f.IsExisted) {
+              if (f?.IsExisted) {
                 return c;
               }
             })
             .filter(k => k !== undefined);
-          console.log('findSyncContacts', findSyncContacts, formatted);
+
           setSyncContacts(findSyncContacts);
           setContacts(formatted);
         } catch (err) {
