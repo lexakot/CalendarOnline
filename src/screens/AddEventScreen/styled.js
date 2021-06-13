@@ -101,3 +101,33 @@ export const Label = styled.Text`
   color: #16243D;
   font-size: 14px;
 `;
+
+export const ValueContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  opacity: 0.4;
+`;
+
+export const Value = styled.Text`
+  color: #16243D;
+  font-size: 14px;
+  margin-right: 15px;
+`;
+
+export const ContactsRow = styled.View`
+  flex-direction: row;
+`;
+
+export const ContactNameContainer = styled.View`
+  flex-direction: row;
+`;
+
+export const ContactLastname = styled.Text`
+  color: #16243D;
+  font-weight: bold;
+  font-size: 16px;
+`;
+
+export const ContactFirstname = styled.Text`
+  font-size: 16px;
+`;

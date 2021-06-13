@@ -4,22 +4,24 @@ import RadioButton from '../../../../components/RadioButton';
 
 import * as S from './styled';
 
-const RemindModal = ({visible, close}) => {
+const options = ['Без напоминания', 'За 1 час', 'За 15 минут'];
+
+const RemindModal = ({visible, close, setOption, activeOption}) => {
   return (
     <BottomModal
       visible={visible}
       title="Напоминание"
       height={234}
       close={close}>
-      <S.RadioButtonContainer>
-        <RadioButton isActive label="Без напоминания" />
-      </S.RadioButtonContainer>
-      <S.RadioButtonContainer>
-        <RadioButton label="За 1 час" />
-      </S.RadioButtonContainer>
-      <S.RadioButtonContainer withoutBorder>
-        <RadioButton label="За 15 минут" />
-      </S.RadioButtonContainer>
+      {options.map(option => (
+        <S.RadioButtonContainer>
+          <RadioButton
+            onPress={() => setOption('remind', option)}
+            isActive={option === activeOption}
+            label={option}
+          />
+        </S.RadioButtonContainer>
+      ))}
     </BottomModal>
   );
 };

@@ -33,7 +33,7 @@ const Screens = () => {
   return (
     <Provider store={store}>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="AddEvent" headerMode="none">
+        <Stack.Navigator headerMode="none">
           <Stack.Screen name="PhoneEnter" component={PhoneEnterScreen} />
           <Stack.Screen name="CodeConfirm" component={CodeConfirmScreen} />
           <Stack.Screen name="Tabs" component={TabsNavigation} />

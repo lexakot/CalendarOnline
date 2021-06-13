@@ -28,12 +28,12 @@ const Contact = ({contact, onContactPress, selectedContacts}) => {
   );
 };
 
-const ContactModal = ({visible, close}) => {
+const ContactModal = ({visible, close, selectedContacts, setSelectedContacts}) => {
   const [tabSelected, setTabSelected] = React.useState(0);
   const [searchString, setSearchString] = React.useState('');
   const [contacts, setContacts] = React.useState([]);
   const [permissionsError, setPermissionsError] = React.useState(false);
-  const [selectedContacts, setSelectedContacts] = React.useState([]);
+  // const [selectedContacts, setSelectedContacts] = React.useState([]);
 
   const addContact = contact => {
     setSelectedContacts([...selectedContacts, contact]);

@@ -4,22 +4,23 @@ import RadioButton from '../../../../components/RadioButton';
 
 import * as S from './styled';
 
-const RepeatModal = ({visible, close}) => {
+const options = ['Без повтора', 'Только выходные', 'Только будни'];
+const RepeatModal = ({visible, close, setOption, activeOption}) => {
   return (
     <BottomModal
       visible={visible}
       title="Повторяемость"
       height={234}
       close={close}>
-      <S.RadioButtonContainer>
-        <RadioButton isActive label="Без повтора" />
-      </S.RadioButtonContainer>
-      <S.RadioButtonContainer>
-        <RadioButton label="Только выходные" />
-      </S.RadioButtonContainer>
-      <S.RadioButtonContainer withoutBorder>
-        <RadioButton label="Только будни" />
-      </S.RadioButtonContainer>
+      {options.map(option => (
+        <S.RadioButtonContainer>
+          <RadioButton
+            onPress={() => setOption('repeat', option)}
+            isActive={activeOption === option}
+            label={option}
+          />
+        </S.RadioButtonContainer>
+      ))}
     </BottomModal>
   );
 };

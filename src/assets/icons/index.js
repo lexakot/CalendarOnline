@@ -7,6 +7,8 @@ import MessageIcon from '../icons/message.svg';
 import RepeatIcon from '../icons/repeat.svg';
 import BellIcon from '../icons/bell.svg';
 import PlusIcon from '../icons/plus.svg';
+import PlusColorIcon from '../icons/plus-color.svg';
+import RightColorIcon from '../icons/right-color.svg';
 
 export {
   OkIcon,
@@ -18,4 +20,6 @@ export {
   RepeatIcon,
   BellIcon,
   PlusIcon,
+  RightColorIcon,
+  PlusColorIcon,
 };

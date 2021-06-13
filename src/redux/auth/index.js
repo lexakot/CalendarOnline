@@ -1,6 +1,8 @@
-import { Alert } from 'react-native';
 import {call, put, takeEvery} from 'redux-saga/effects';
 import http from '../../services/http';
+import TokenStorage from '../../services/storage/token';
+
+import Axios from 'axios';
 
 const LOGIN_REQUEST = 'auth/LOGIN_REQUEST';
 const LOGIN_SUCCESS = 'auth/LOGIN_SUCCESS';
@@ -63,9 +65,29 @@ export const sendSmsRequest = payload => {
 // <<<WORKERS>>>
 function* login({payload}) {
   try {
-    const {data} = yield call(http.post, '/Identity/getOTP', {
+    const {data} = yield call(http.post, '/api/Identity/getOTP', {
       PhoneNumber: `375${payload}`,
     });
+    const config = {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    };
+    const params = new URLSearchParams();
+    params.append('client_id', 'phone_number_authentication');
+    params.append('grant_type', 'phone_number_token');
+    params.append('phone_number', `375${payload}`);
+    params.append('verification_token', data.verify_token);
+    params.append('client_secret', 'secret');
+    params.append('scope', 'myapi');
+    const {data: loginData} = yield call(
+      Axios.post,
+      'http://82.146.48.248/connect/token',
+      params,
+      config,
+    );
+    console.log('loginData', loginData);
+    yield call(TokenStorage.save, loginData.access_token);
     alert(data.verify_token);
     yield put({
       type: LOGIN_SUCCESS,
