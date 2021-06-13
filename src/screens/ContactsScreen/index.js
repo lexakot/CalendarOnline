@@ -47,8 +47,6 @@ const ContactsScreen = () => {
         try {
           const res = await Contacts.getAll();
           setContacts(res);
-          console.log(res);
-          alert(JSON.stringify(res[0].phoneNumbers));
         } catch (err) {
           alert(err);
         }

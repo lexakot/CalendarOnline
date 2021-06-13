@@ -10,6 +10,7 @@ const TopBar = ({
   withBackButton = false,
   withRightButton = false,
   renderRightButton = () => {},
+  onRightButtonPress = () => {},
 }) => {
   const navigation = useNavigation();
   return (
@@ -21,7 +22,9 @@ const TopBar = ({
       ) : null}
       <S.Title>{title}</S.Title>
       {withRightButton ? (
-        <S.RightButton>{renderRightButton()}</S.RightButton>
+        <S.RightButton onPress={onRightButtonPress}>
+          {renderRightButton()}
+        </S.RightButton>
       ) : null}
     </S.Container>
   );

@@ -14,3 +14,15 @@ export const TopHandle = styled.View`
   opacity: 0.1;
   margin-top: 8px;
 `;
+
+export const AddButton = styled.TouchableOpacity`
+  width: 44px;
+  height: 44px;
+  background-color: #4A70BF;
+  position: absolute;
+  bottom: 28px;
+  right: 28px;
+  border-radius: 8px;
+  justify-content: center;
+  align-items: center;
+`;

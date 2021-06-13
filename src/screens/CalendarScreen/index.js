@@ -1,13 +1,11 @@
 import React, {useCallback, useMemo} from 'react';
 import BottomSheet from '@gorhom/bottom-sheet';
 import Calendar from '../../components/Calendar';
-
-import Contacts from 'react-native-contacts';
+import {PlusIcon} from '../../assets/icons';
 
 import * as S from './styled';
-import {useFocusEffect} from '@react-navigation/native';
 
-const CalendarScreen = () => {
+const CalendarScreen = ({navigation}) => {
   const [isExpanded, setExpanded] = React.useState(true);
   const bottomSheetRef = React.useRef(null);
   const snapPoints = useMemo(() => ['30%', '67%'], []);
@@ -37,6 +35,9 @@ const CalendarScreen = () => {
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
       />
+      <S.AddButton onPress={() => navigation.navigate('AddEvent')}>
+        <PlusIcon />
+      </S.AddButton>
     </S.Container>
   );
 };
