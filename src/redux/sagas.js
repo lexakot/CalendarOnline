@@ -2,6 +2,7 @@ import {all, fork} from 'redux-saga/effects';
 
 import * as authWatchers from './auth';
 import * as contactsWatchers from './contacts';
+import * as eventsWatchers from './events';
 
 export default function* root() {
   yield all([
@@ -9,5 +10,6 @@ export default function* root() {
     fork(authWatchers.watchSendSms),
     fork(authWatchers.watchLogOut),
     fork(contactsWatchers.watchGetContacts),
+    fork(eventsWatchers.watchGetEvents),
   ]);
 }

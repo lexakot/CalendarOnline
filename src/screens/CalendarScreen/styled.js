@@ -26,3 +26,8 @@ export const AddButton = styled.TouchableOpacity`
   justify-content: center;
   align-items: center;
 `;
+
+export const ScrollContainer = styled.ScrollView`
+  flex: 1;
+  padding: 0 28px;
+`;
