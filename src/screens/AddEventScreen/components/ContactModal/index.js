@@ -1,14 +1,16 @@
+/* eslint-disable react-native/no-inline-styles */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
-import {FlatList, PermissionsAndroid} from 'react-native';
-import Contacts from 'react-native-contacts';
+import {connect} from 'react-redux';
+import {FlatList} from 'react-native';
+
+import {getContactsRequest} from '../../../../redux/contacts';
 
 import SearchIcon from '../../../../assets/icons/search.svg';
 import CheckIcon from '../../../../assets/icons/check-mark.svg';
 import BottomModal from '../../../../components/BottomModal';
-import TokenStorage from '../../../../services/storage/token';
 
 import * as S from './styled';
-import axios from 'axios';
 
 const Contact = ({contact, onContactPress, selectedContacts}) => {
   return (
@@ -36,12 +38,13 @@ const ContactModal = ({
   close,
   selectedContacts,
   setSelectedContacts,
+  getContactsRequest: getContacts,
+  contacts,
+  syncContacts,
+  permissionsError,
 }) => {
   const [tabSelected, setTabSelected] = React.useState(0);
   const [searchString, setSearchString] = React.useState('');
-  const [contacts, setContacts] = React.useState([]);
-  const [syncContacts, setSyncContacts] = React.useState([]);
-  const [permissionsError, setPermissionsError] = React.useState(false);
 
   const addContact = contact => {
     setSelectedContacts([...selectedContacts, contact]);
@@ -80,58 +83,6 @@ const ContactModal = ({
   };
 
   React.useEffect(() => {
-    async function getContacts() {
-      const request = await PermissionsAndroid.requestMultiple([
-        PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
-        PermissionsAndroid.PERMISSIONS.WRITE_CONTACTS,
-      ]);
-
-      if (request['android.permission.READ_CONTACTS'] === 'granted') {
-        try {
-          const res = await Contacts.getAll();
-          const filtered = res.filter(c => c.phoneNumbers.length);
-          const formatted = filtered.map(c => ({
-            ...c,
-            formattedPhone: c.phoneNumbers[0].number
-              .replace(/\s/g, '')
-              .replace('+', '')
-              .replace(new RegExp('-', 'g'), ''),
-          }));
-
-          const phoneNumbers = formatted.map(c => c.formattedPhone);
-
-          const token = await TokenStorage.get();
-          const config = {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-          };
-          const {data} = await axios.post(
-            'http://82.146.48.248:90/api/Contacts/get-contacts',
-            phoneNumbers,
-            config,
-          );
-          console.log('data', data);
-
-          const findSyncContacts = formatted
-            .map(c => {
-              const f = data.find(t => t.PhoneNumber === c.formattedPhone);
-              if (f?.IsExisted) {
-                return c;
-              }
-            })
-            .filter(k => k !== undefined);
-
-          setSyncContacts(findSyncContacts);
-          setContacts(formatted);
-        } catch (err) {
-          alert(err);
-        }
-      } else {
-        setPermissionsError(true);
-      }
-    }
     getContacts();
   }, [JSON.stringify(contacts)]);
 
@@ -170,4 +121,17 @@ const ContactModal = ({
   );
 };
 
-export default ContactModal;
+const mapStateToProps = ({contacts}) => ({
+  contacts: contacts.contacts,
+  syncContacts: contacts.syncContacts,
+  permissionsError: contacts.permissionsError,
+});
+
+const mapDispatchToProps = {
+  getContactsRequest,
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(ContactModal);

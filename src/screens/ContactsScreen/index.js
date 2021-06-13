@@ -1,18 +1,19 @@
+/* eslint-disable react-native/no-inline-styles */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
+import {connect} from 'react-redux';
 
-import {PermissionsAndroid, FlatList} from 'react-native';
-import Contacts from 'react-native-contacts';
+import {FlatList} from 'react-native';
+
+import {getContactsRequest} from '../../redux/contacts';
 
 import SearchIcon from '../../assets/icons/search.svg';
 import RightArrowIcon from '../../assets/icons/right-arrow.svg';
 import UserPlusIcon from '../../assets/icons/user-plus.svg';
 
-import TokenStorage from '../../services/storage/token';
-
 import TopBar from '../../components/TopBar';
 
 import * as S from './styled';
-import axios from 'axios';
 
 const Contact = ({contact}) => {
   return (
@@ -32,12 +33,12 @@ const Contact = ({contact}) => {
     </S.ContactContainer>
   );
 };
-const ContactsScreen = () => {
+const ContactsScreen = props => {
   const [tabSelected, setTabSelected] = React.useState(0);
-  const [contacts, setContacts] = React.useState([]);
-  const [syncContacts, setSyncContacts] = React.useState([]);
-  const [permissionsError, setPermissionsError] = React.useState(false);
+
   const [searchString, setSearchString] = React.useState('');
+
+  const {contacts, syncContacts, permissionsError} = props;
 
   const renderListOfContacts = () => {
     if (permissionsError) {
@@ -65,59 +66,7 @@ const ContactsScreen = () => {
   };
 
   React.useEffect(() => {
-    async function getContacts() {
-      const request = await PermissionsAndroid.requestMultiple([
-        PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
-        PermissionsAndroid.PERMISSIONS.WRITE_CONTACTS,
-      ]);
-
-      if (request['android.permission.READ_CONTACTS'] === 'granted') {
-        try {
-          const res = await Contacts.getAll();
-          const filtered = res.filter(c => c.phoneNumbers.length);
-          const formatted = filtered.map(c => ({
-            ...c,
-            formattedPhone: c.phoneNumbers[0].number
-              .replace(/\s/g, '')
-              .replace('+', '')
-              .replace(new RegExp('-', 'g'), ''),
-          }));
-
-          const phoneNumbers = formatted.map(c => c.formattedPhone);
-
-          const token = await TokenStorage.get();
-          const config = {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-          };
-          const {data} = await axios.post(
-            'http://82.146.48.248:90/api/Contacts/get-contacts',
-            phoneNumbers,
-            config,
-          );
-          console.log('data', data);
-
-          const findSyncContacts = formatted
-            .map(c => {
-              const f = data.find(t => t.PhoneNumber === c.formattedPhone);
-              if (f?.IsExisted) {
-                return c;
-              }
-            })
-            .filter(k => k !== undefined);
-          console.log('findSyncContacts', findSyncContacts);
-          setSyncContacts(findSyncContacts);
-          setContacts(formatted);
-        } catch (err) {
-          alert(err);
-        }
-      } else {
-        setPermissionsError(true);
-      }
-    }
-    getContacts();
+    props.getContactsRequest();
   }, [JSON.stringify(contacts)]);
 
   return (
@@ -150,4 +99,17 @@ const ContactsScreen = () => {
   );
 };
 
-export default ContactsScreen;
+const mapStateToProps = ({contacts}) => ({
+  contacts: contacts.contacts,
+  syncContacts: contacts.syncContacts,
+  permissionsError: contacts.permissionsError,
+});
+
+const mapDispatchToProps = {
+  getContactsRequest,
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(ContactsScreen);
