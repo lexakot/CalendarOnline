@@ -35,7 +35,8 @@ const AddEventScreen = ({navigation}) => {
   const [isNotifyEnabled, setNotifyEnabled] = React.useState(false);
   // INFO
   const [selectedDay, setSelectedDay] = React.useState({
-    '2021-06-13': {
+    // '2021-06-13': {
+    [moment().format('YYYY-MM-DD')]: {
       selected: true,
       customStyles: {
         container: {
@@ -78,12 +79,12 @@ const AddEventScreen = ({navigation}) => {
 
   const onDateChange = (value, type) => {
     if (type === 'timeStart') {
-      const endTime = new Date(value);
-      endTime.setHours(value.getHours(), value.getMinutes() + 5);
+      const eTime = new Date(value);
+      eTime.setHours(value.getHours(), value.getMinutes() + 5);
       setEventInfo({
         ...eventInfo,
         timeStart: value,
-        timeEnd: endTime,
+        timeEnd: eTime,
       });
       return;
     }
@@ -211,36 +212,40 @@ const AddEventScreen = ({navigation}) => {
   };
 
   const onCreateEvent = async () => {
-    const token = await TokenStorage.get();
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    };
-    const {data} = await Axios.post(
-      'http://82.146.48.248:90/api/Events',
-      {
-        Name: eventInfo.name,
-        Description: eventInfo.description,
-        StartDate: `${Object.keys(selectedDay)[0]}T${moment(
-          eventInfo.timeStart,
-        ).format('HH:mm:ss')}`,
-        EndDate: `${Object.keys(selectedDay)[0]}T${moment(
-          eventInfo.timeEnd,
-        ).format('HH:mm:ss')}`,
-        RepeatType: 'DoNotRepeat',
-        InvitedUsers: ['e68aa406-00e2-4256-a089-adfa6642b91d'],
-        InvitedNonExistedPhoneNumbers: ['375293825122'],
-        Color: selectedColor,
-        NotifyBeforeInMinutes: 15,
-        ConfirmBeforeInHours: 12,
-      },
-      config,
-    );
+    try {
+      const token = await TokenStorage.get();
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      const {data} = await Axios.post(
+        'http://82.146.48.248:90/api/Events',
+        {
+          Name: eventInfo.name,
+          Description: eventInfo.description,
+          StartDate: `${Object.keys(selectedDay)[0]}T${moment(
+            eventInfo.timeStart,
+          ).format('HH:mm:ss')}`,
+          EndDate: `${Object.keys(selectedDay)[0]}T${moment(
+            eventInfo.timeEnd,
+          ).format('HH:mm:ss')}`,
+          RepeatType: 'DoNotRepeat',
+          InvitedUsers: ['e68aa406-00e2-4256-a089-adfa6642b91d'],
+          InvitedNonExistedPhoneNumbers: ['375293825122'],
+          Color: selectedColor,
+          NotifyBeforeInMinutes: 15,
+          ConfirmBeforeInHours: 12,
+        },
+        config,
+      );
 
-    navigation.goBack();
-    console.log('data', data);
+      navigation.goBack();
+      console.log('data', data);
+    } catch (err) {
+      alert(JSON.stringify(err));
+    }
   };
 
   return (

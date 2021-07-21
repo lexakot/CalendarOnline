@@ -21,16 +21,36 @@ const CalendarScreen = ({navigation, getEventsRequest: getEvents, events}) => {
   const bottomSheetRef = React.useRef(null);
   const snapPoints = useMemo(() => ['30%', '67%'], []);
 
-  const date = moment().format('YYYY-MM-DD');
+  const [date, setDate] = React.useState({
+    [moment().format('YYYY-MM-DD')]: {
+      // dots: [vacation],
+      selected: true,
+      marked: true,
+      customStyles: {
+        container: {
+          backgroundColor: '#FFFFFF',
+          borderRadius: 8,
+        },
+        text: {
+          color: '#16243D',
+          fontWeight: 'bold',
+        },
+      },
+    },
+  });
 
-  useEffect(() => {
+  useFocusEffect(() => {
     getEventsCallback();
-  }, [getEventsCallback]);
+  });
+
+  // useEffect(() => {
+  //   getEventsCallback();
+  // }, [getEventsCallback]);
 
   // callbacks
   const getEventsCallback = useCallback(() => {
-    getEvents(date);
-  }, [getEvents]);
+    getEvents(Object.keys(date)[0]);
+  }, [date, getEvents]);
 
   const handleSheetChanges = useCallback(index => {
     console.log('handleSheetChanges', index);
@@ -50,16 +70,19 @@ const CalendarScreen = ({navigation, getEventsRequest: getEvents, events}) => {
   );
 
   const renderDateBlocks = () => {
-    if (!events.length) {
-      return null;
-    }
-    const secondDay = moment(date)
+    // if (!events.length) {
+    //   return null;
+    // }
+    const secondDay = moment(Object.keys(date)[0])
       .add(1, 'day')
       .format('YYYY-MM-DD');
-    const thirdDay = moment(date)
+    const thirdDay = moment(Object.keys(date)[0])
       .add(2, 'day')
       .format('YYYY-MM-DD');
 
+    if (!Object.keys(groupedEvents).includes(Object.keys(date)[0])) {
+      groupedEvents[Object.keys(date)[0]] = [];
+    }
     if (!Object.keys(groupedEvents).includes(secondDay)) {
       groupedEvents[secondDay] = [];
     }
@@ -69,18 +92,54 @@ const CalendarScreen = ({navigation, getEventsRequest: getEvents, events}) => {
 
     return (
       <>
-        {Object.keys(groupedEvents).map(date => (
-          <DateBlock
-            title={moment(date).format('D MMMM, dddd')}
-            events={groupedEvents[date]}
-          />
-        ))}
+        {Object.keys(groupedEvents)
+          .sort((a, b) => {
+            if (a < b) {
+              return -1;
+            } else if (b < a) {
+              return 1;
+            } else {
+              return 0;
+            }
+          })
+          .map(d => (
+            <DateBlock
+              title={moment(d).format('D MMMM, dddd')}
+              events={groupedEvents[d]}
+            />
+          ))}
       </>
     );
   };
+
+  const onDateChange = d => {
+    getEvents(d);
+    setDate({
+      [d]: {
+        // dots: [vacation],
+        selected: true,
+        marked: true,
+        customStyles: {
+          container: {
+            backgroundColor: '#FFFFFF',
+            borderRadius: 8,
+          },
+          text: {
+            color: '#16243D',
+            fontWeight: 'bold',
+          },
+        },
+      },
+    });
+  };
+
   return (
     <S.Container>
-      <Calendar handleExpand={handleExpand} />
+      <Calendar
+        selectedDate={date}
+        selectDay={onDateChange}
+        handleExpand={handleExpand}
+      />
       <BottomSheet
         ref={bottomSheetRef}
         handleComponent={() => <S.TopHandle />}

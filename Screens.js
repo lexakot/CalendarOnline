@@ -12,6 +12,7 @@ import CodeConfirmScreen from './src/screens/CodeConfirmScreen';
 import CalendarScreen from './src/screens/CalendarScreen';
 import ContactsScreen from './src/screens/ContactsScreen';
 import AddEventScreen from './src/screens/AddEventScreen';
+import ViewEventScreen from './src/screens/ViewEventScreen';
 
 const Stack = createStackNavigator();
 const Tabs = createBottomTabNavigator();
@@ -33,11 +34,12 @@ const Screens = () => {
   return (
     <Provider store={store}>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Tabs" headerMode="none">
+        <Stack.Navigator headerMode="none">
           <Stack.Screen name="PhoneEnter" component={PhoneEnterScreen} />
           <Stack.Screen name="CodeConfirm" component={CodeConfirmScreen} />
           <Stack.Screen name="Tabs" component={TabsNavigation} />
           <Stack.Screen name="AddEvent" component={AddEventScreen} />
+          <Stack.Screen name="ViewEvent" component={ViewEventScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

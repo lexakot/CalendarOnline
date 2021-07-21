@@ -9,6 +9,9 @@ import BellIcon from '../icons/bell.svg';
 import PlusIcon from '../icons/plus.svg';
 import PlusColorIcon from '../icons/plus-color.svg';
 import RightColorIcon from '../icons/right-color.svg';
+import ContactsIcon from '../icons/contacts.svg';
+import BellColorIcon from '../icons/bell-color.svg';
+import HelpIcon from '../icons/help.svg';
 
 export {
   OkIcon,
@@ -22,4 +25,7 @@ export {
   PlusIcon,
   RightColorIcon,
   PlusColorIcon,
+  ContactsIcon,
+  BellColorIcon,
+  HelpIcon,
 };

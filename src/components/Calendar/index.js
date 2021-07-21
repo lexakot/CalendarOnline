@@ -1,5 +1,6 @@
 import React from 'react';
 import XDate from 'xdate';
+import moment from 'moment';
 import {Calendar, LocaleConfig} from 'react-native-calendars';
 import * as RN from 'react-native';
 
@@ -53,7 +54,8 @@ const vacation = {key: 'vacation', dotColor: 'red', selectedDotColor: 'red'};
 class CalendarComponent extends React.Component {
   state = {
     markedDates: {
-      '2021-05-18': {
+      // '2021-06-14': {
+      [moment().format('YYYY-MM-DD')]: {
         dots: [vacation],
         selected: true,
         marked: true,
@@ -82,6 +84,7 @@ class CalendarComponent extends React.Component {
 
   selectdDay = e => {
     console.log('day', e);
+    this.props.selectDay(e.dateString);
     this.setState({
       markedDates: {
         [e.dateString]: {

@@ -1,10 +1,16 @@
 import React from 'react';
 import moment from 'moment';
 import * as S from './styled';
+import {useNavigation} from '@react-navigation/native';
 
 const Event = ({event}) => {
+  const navigation = useNavigation();
+  const onPress = () =>
+    navigation.navigate('ViewEvent', {
+      event,
+    });
   return (
-    <S.Container>
+    <S.Container onPress={onPress}>
       <S.EventColor color={event.Color} />
       <S.Name>{event.Name}</S.Name>
       <S.Time>
