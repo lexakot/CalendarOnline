@@ -13,6 +13,7 @@ import CalendarScreen from './src/screens/CalendarScreen';
 import ContactsScreen from './src/screens/ContactsScreen';
 import AddEventScreen from './src/screens/AddEventScreen';
 import ViewEventScreen from './src/screens/ViewEventScreen';
+import NotificationsScreen from './src/screens/NotificationsScreen';
 
 const Stack = createStackNavigator();
 const Tabs = createBottomTabNavigator();
@@ -26,6 +27,7 @@ const TabsNavigation = () => {
     <Tabs.Navigator tabBar={props => <TabBar {...props} />} headerMode="none">
       <Tabs.Screen name="Contacts" component={ContactsScreen} />
       <Tabs.Screen name="Calendar" component={CalendarScreen} />
+      <Tabs.Screen name="Notifications" component={NotificationsScreen} />
     </Tabs.Navigator>
   );
 };

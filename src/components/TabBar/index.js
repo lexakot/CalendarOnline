@@ -24,10 +24,10 @@ const config = [
     id: 1,
   },
   {
-    name: 'Контакты',
+    name: 'Уведомления',
     icon: <NotificationIcon />,
     activeIcon: <NotificationIcon />,
-    route: 'Contacts',
+    route: 'Notifications',
     id: 2,
   },
   {
