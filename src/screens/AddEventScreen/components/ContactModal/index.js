@@ -47,7 +47,19 @@ const ContactModal = ({
   const [searchString, setSearchString] = React.useState('');
 
   const addContact = contact => {
-    setSelectedContacts([...selectedContacts, contact]);
+    const findContactIndex = selectedContacts.findIndex(
+      i => i.displayName === contact.displayName,
+    );
+    console.log(findContactIndex);
+    if (!(findContactIndex >= 0)) {
+      setSelectedContacts([...selectedContacts, contact]);
+    } else {
+      const formatted = selectedContacts.filter(
+        (_, index) => index !== findContactIndex,
+      );
+      setSelectedContacts(formatted);
+    }
+    // setSelectedContacts([...selectedContacts, contact]);
   };
 
   const renderListOfContacts = () => {

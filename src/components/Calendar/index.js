@@ -44,7 +44,7 @@ LocaleConfig.locales.ru = {
     'Vendredi',
     'Samedi',
   ],
-  dayNamesShort: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+  dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
   today: "Aujourd'hui",
 };
 LocaleConfig.defaultLocale = 'ru';
@@ -54,7 +54,6 @@ const vacation = {key: 'vacation', dotColor: 'red', selectedDotColor: 'red'};
 class CalendarComponent extends React.Component {
   state = {
     markedDates: {
-      // '2021-06-14': {
       [moment().format('YYYY-MM-DD')]: {
         dots: [vacation],
         selected: true,
@@ -83,7 +82,6 @@ class CalendarComponent extends React.Component {
   };
 
   selectdDay = e => {
-    console.log('day', e);
     this.props.selectDay(e.dateString);
     this.setState({
       markedDates: {
@@ -106,7 +104,6 @@ class CalendarComponent extends React.Component {
     });
   };
   render() {
-    console.log(this.state);
     return (
       <>
         <Calendar

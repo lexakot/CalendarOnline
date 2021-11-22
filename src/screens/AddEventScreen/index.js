@@ -135,7 +135,7 @@ const AddEventScreen = ({navigation}) => {
             mode="time"
             onDateChange={e => onDateChange(e, 'timeStart')}
             date={eventInfo.timeStart}
-            minimumDate={new Date()}
+            // minimumDate={new Date()}
           />
         )}
         {modalTypeVisible === 'timeEnd' && (

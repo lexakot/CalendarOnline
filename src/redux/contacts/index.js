@@ -51,6 +51,7 @@ function* getContacts() {
     ]);
     if (request['android.permission.READ_CONTACTS'] === 'granted') {
       const res = yield call(Contacts.getAll);
+
       const filtered = res.filter(c => c.phoneNumbers.length);
       const formatted = filtered.map(c => ({
         ...c,
@@ -59,18 +60,12 @@ function* getContacts() {
           .replace('+', '')
           .replace(new RegExp('-', 'g'), ''),
       }));
-      console.log('res', res);
       const phoneNumbers = formatted.map(c => c.formattedPhone);
 
-      const {data} = yield call(
-        http.post,
-        '/api/Contacts/get-contacts',
-        phoneNumbers,
-      );
-
+      const {data} = yield call(http.get, '/api/Contacts', phoneNumbers);
       const findSyncContacts = formatted
         .map(c => {
-          const f = data.find(t => t.PhoneNumber === c.formattedPhone);
+          const f = data.Contacts.find(t => t.PhoneNumber === c.formattedPhone);
           if (f?.IsExisted) {
             return c;
           }
