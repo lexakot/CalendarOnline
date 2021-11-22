@@ -12,7 +12,7 @@ export const Container = styled.View`
 `;
 
 export const Tint = styled.View`
-  background: #4A70BF;
+  background-color: ${({notDisplayed}) => notDisplayed ? 'transparent' : '#4A70BF'};
   border-radius: 8;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
@@ -20,6 +20,12 @@ export const Tint = styled.View`
   height: 80px;
   align-self: center;
   margin-right: 16px;
+`;
+
+export const IconContainer = styled.View`
+  position: absolute;
+  top: 0;
+  right: 0;
 `;
 
 export const Title = styled.Text`
@@ -76,6 +82,8 @@ export const AcceptButton = styled.TouchableOpacity`
   border-radius: 32px;
   background-color: #3DAD7A;
   margin-right: 20px;
+  justify-content: center;
+  align-items: center;
 `;
 
 export const DeclineButton = styled.TouchableOpacity`
@@ -83,4 +91,6 @@ export const DeclineButton = styled.TouchableOpacity`
   height: 32px;
   border-radius: 32px;
   background-color: #F25449;
+  align-items: center;
+  justify-content: center;
 `;

@@ -221,7 +221,7 @@ const AddEventScreen = ({navigation}) => {
         },
       };
       const {data} = await Axios.post(
-        'http://82.146.48.248:90/api/Events',
+        'http://178.250.159.105:90/api/Events',
         {
           Name: eventInfo.name,
           Description: eventInfo.description,

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import TokenStorage from '../storage/token';
 
-const baseURL = 'http://82.146.48.248:90';
+const baseURL = 'http://178.250.159.105:90';
 
 const http = axios.create({
   withCredentials: false,

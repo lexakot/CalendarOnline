@@ -1,6 +1,6 @@
-import {useFocusEffect} from '@react-navigation/native';
+/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
-import {FlatList} from 'react-native';
+import {FlatList, ActivityIndicator} from 'react-native';
 
 import TopBar from '../../components/TopBar';
 import http from '../../services/http/api';
@@ -9,32 +9,85 @@ import NotificationCard from './NotificationCard';
 import * as S from './styled';
 
 const NotificationsScreen = props => {
+  const [loading, setLoading] = React.useState(false);
   const [tabSelected, setTabSelected] = React.useState(0);
   const [notifications, setNotifications] = React.useState([]);
 
   React.useEffect(() => {
     getNotifications();
-  }, [getNotifications]);
+  }, [tabSelected]);
 
-  const getNotifications = React.useCallback(async () => {
-    const {data} = await http.get('/api/Invites');
+  const getNotifications = async () => {
+    console.log('getNotifications')
+    let data = [];
+    setLoading(true);
+    if (tabSelected === 0) {
+      const {data: data0} = await http.get('/api/Invites');
+      data = data0;
+    }
+
+    if (tabSelected === 2) {
+      const {data: data2} = await http.get('/api/Invites/history');
+      data = data2;
+    }
     console.log('data', data);
+    setLoading(false);
     setNotifications(data);
-  }, []);
+  };
+
+  // const getNotifications = React.useCallback(async () => {
+  //   let data = [];
+  //   setLoading(true);
+  //   if (tabSelected === 0) {
+  //     const {data: data0} = await http.get('/api/Invites');
+  //     data = data0;
+  //   }
+
+  //   if (tabSelected === 2) {
+  //     const {data: data2} = await http.get('/api/Invites/history');
+  //     data = data2;
+  //   }
+  //   console.log('data', data);
+  //   setNotifications(data);
+  //   setLoading(false);
+  // }, [tabSelected]);
+
+  const onAcceptInvite = async inviteId => {
+    const {data} = await http.put(`/api/Invites/${inviteId}/accept`);
+    console.log('onAcceptInvite', data);
+    getNotifications();
+  };
+
+  const onDeclineInvite = async inviteId => {
+    const {data} = await http.put(`/api/Invites/${inviteId}/decline`);
+    console.log('onDeclineInvite', data);
+    getNotifications();
+  };
 
   const renderNotificationsList = () => {
-    return (
-      <FlatList
-        data={notifications}
-        renderItem={({item, index}) => (
-          <NotificationCard notification={item} key={index} />
-        )}
-        contentContainerStyle={{
-          paddingHorizontal: 20,
-        }}
-      />
-    );
+    if (loading) {
+      return <ActivityIndicator style={{marginTop: 20}} />;
+    } else {
+      return (
+        <FlatList
+          data={notifications}
+          renderItem={({item, index}) => (
+            <NotificationCard
+              onAcceptInvite={onAcceptInvite}
+              onDeclineInvite={onDeclineInvite}
+              notification={item}
+              key={index}
+            />
+          )}
+          contentContainerStyle={{
+            paddingHorizontal: 20,
+          }}
+        />
+      );
+    }
   };
+
+  console.log('loading', loading);
   return (
     <S.Container>
       <TopBar title="Уведомления" />

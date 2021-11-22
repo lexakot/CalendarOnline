@@ -82,7 +82,7 @@ function* login({payload}) {
     params.append('scope', 'myapi');
     const {data: loginData} = yield call(
       Axios.post,
-      'http://82.146.48.248/connect/token',
+      'http://178.250.159.105/connect/token',
       params,
       config,
     );

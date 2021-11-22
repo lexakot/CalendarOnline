@@ -12,6 +12,10 @@ import RightColorIcon from '../icons/right-color.svg';
 import ContactsIcon from '../icons/contacts.svg';
 import BellColorIcon from '../icons/bell-color.svg';
 import HelpIcon from '../icons/help.svg';
+import Declined from '../icons/x-circle.svg';
+import Accepted from '../icons/accepted.svg';
+import Decline from '../icons/decline.svg';
+import Accept from '../icons/accept.svg';
 
 export {
   OkIcon,
@@ -28,4 +32,8 @@ export {
   ContactsIcon,
   BellColorIcon,
   HelpIcon,
+  Declined,
+  Accepted,
+  Decline,
+  Accept,
 };
