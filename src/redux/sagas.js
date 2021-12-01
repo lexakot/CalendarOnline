@@ -8,6 +8,7 @@ export default function* root() {
   yield all([
     fork(authWatchers.watchLogin),
     fork(authWatchers.watchSendSms),
+    fork(authWatchers.watchGetProfile),
     fork(authWatchers.watchLogOut),
     fork(contactsWatchers.watchGetContacts),
     fork(eventsWatchers.watchGetEvents),

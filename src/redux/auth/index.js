@@ -1,6 +1,9 @@
 import {call, put, takeEvery} from 'redux-saga/effects';
-import http from '../../services/http';
+import httpAuth from '../../services/http';
+import http from '../../services/http/api';
 import TokenStorage from '../../services/storage/token';
+
+import messaging from '@react-native-firebase/messaging';
 
 import Axios from 'axios';
 
@@ -16,10 +19,17 @@ const SEND_SMS_REQUEST = 'auth/SEND_SMS_REQUEST';
 const SEND_SMS_SUCCESS = 'auth/SEND_SMS_SUCCESS';
 const SEND_SMS_FAILURE = 'auth/SEND_SMS_FAILURE';
 
+const CODE_ENTERED_SUCCESS = 'auth/CODE_ENTERED_SUCCESS';
+
+const GET_PROFILE_REQUEST = 'auth/GET_PROFILE_REQUEST';
+const GET_PROFILE_SUCCESS = 'auth/GET_PROFILE_SUCCESS';
+const GET_PROFILE_FAILURE = 'auth/GET_PROFILE_FAILURE';
+
 export const initialState = {
   authenticated: false,
   loading: false,
   code: '',
+  userData: {},
 };
 
 export default function reducer(state = initialState, action = {}) {
@@ -27,18 +37,27 @@ export default function reducer(state = initialState, action = {}) {
     case LOGIN_REQUEST:
       return {...state, loading: true};
     case LOGIN_SUCCESS:
-      return {...state, loading: false, authenticated: true, code: action.code};
+      return {...state, loading: false, code: action.code};
     case LOGIN_FAILURE:
       return {...state, loading: false};
 
+    case CODE_ENTERED_SUCCESS:
+      return {...state, authenticated: true};
     case LOGOUT_SUCCESS:
-      return {...state, loading: false, authenticated: false};
+      return {...state, loading: false, authenticated: false, userData: {}};
 
     case SEND_SMS_REQUEST:
       return {...state, loading: true};
     case SEND_SMS_SUCCESS:
       return {...state, loading: false, sended: true};
     case SEND_SMS_FAILURE:
+      return {...state, loading: false};
+
+    case GET_PROFILE_REQUEST:
+      return {...state, loading: true};
+    case GET_PROFILE_SUCCESS:
+      return {...state, loading: false, userData: action.userData};
+    case GET_PROFILE_FAILURE:
       return {...state, loading: false};
     default:
       return state;
@@ -51,8 +70,16 @@ export const loginRequest = payload => ({
   payload,
 });
 
+export const codeEnteredSuccess = () => ({
+  type: CODE_ENTERED_SUCCESS,
+});
+
 export const logoutRequest = () => ({
   type: LOGOUT_REQUEST,
+});
+
+export const getProfileRequest = () => ({
+  type: GET_PROFILE_REQUEST,
 });
 
 export const sendSmsRequest = payload => {
@@ -65,7 +92,7 @@ export const sendSmsRequest = payload => {
 // <<<WORKERS>>>
 function* login({payload}) {
   try {
-    const {data} = yield call(http.post, '/api/Identity/getOTP', {
+    const {data} = yield call(httpAuth.post, '/api/Identity/getOTP', {
       PhoneNumber: `375${payload}`,
     });
     const config = {
@@ -73,6 +100,11 @@ function* login({payload}) {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
     };
+    // yield call(messaging().requestPermission);
+    // yield call(messaging().registerDeviceForRemoteMessages);
+    const deviceToken = yield messaging().getToken();
+    console.log('deviceTOken', deviceToken);
+
     const params = new URLSearchParams();
     params.append('client_id', 'phone_number_authentication');
     params.append('grant_type', 'phone_number_token');
@@ -80,13 +112,15 @@ function* login({payload}) {
     params.append('verification_token', data.verify_token);
     params.append('client_secret', 'secret');
     params.append('scope', 'myapi');
+    params.append('device_token', deviceToken);
+    params.append('device_type', 'android');
+
     const {data: loginData} = yield call(
       Axios.post,
       'http://178.250.159.105/connect/token',
       params,
       config,
     );
-    console.log('loginData', loginData);
     yield call(TokenStorage.save, loginData.access_token);
     alert(data.verify_token);
     yield put({
@@ -101,6 +135,7 @@ function* login({payload}) {
 
 function* logOut() {
   try {
+    yield call(TokenStorage.delete);
     yield put({
       type: LOGOUT_SUCCESS,
     });
@@ -122,6 +157,18 @@ function* sendSms({payload}) {
   }
 }
 
+function* getProfile() {
+  try {
+    const {data} = yield call(http.get, '/api/Profile');
+    yield put({
+      type: GET_PROFILE_SUCCESS,
+      userData: data,
+    });
+  } catch (err) {
+    console.log('test-err', err.response);
+  }
+}
+
 // <<<WATCHERS>>>
 export function* watchLogin() {
   yield takeEvery(LOGIN_REQUEST, login);
@@ -133,4 +180,8 @@ export function* watchLogOut() {
 
 export function* watchSendSms() {
   yield takeEvery(SEND_SMS_REQUEST, sendSms);
+}
+
+export function* watchGetProfile() {
+  yield takeEvery(GET_PROFILE_REQUEST, getProfile);
 }

@@ -1,11 +1,11 @@
-import React from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect } from 'react';
 import {Dimensions} from 'react-native';
 import moment from 'moment';
 import 'moment/locale/ru';
 import {Calendar, LocaleConfig} from 'react-native-calendars';
 import DatePicker from 'react-native-date-picker';
 import TopBar from '../../components/TopBar';
-import http from '../../services/http';
 import TokenStorage from '../../services/storage/token';
 import Axios from 'axios';
 
@@ -30,10 +30,20 @@ import RepeatModal from './components/RepeatModal';
 import RemindModal from './components/RemindModal';
 import ContactModal from './components/ContactModal';
 
+import messaging from '@react-native-firebase/messaging';
+
 const AddEventScreen = ({navigation}) => {
   const [isConfirmEnabled, setConfirmEnabled] = React.useState(false);
   const [isNotifyEnabled, setNotifyEnabled] = React.useState(false);
   // INFO
+  
+  useEffect(async () => {
+    await messaging().requestPermission();
+    await messaging().registerDeviceForRemoteMessages();
+    const deviceToken = await messaging().getToken();
+    messaging().onMessage(e => console.log('newMessage', e));
+    console.log('deviceToken', deviceToken);
+  }, []);
   const [selectedDay, setSelectedDay] = React.useState({
     // '2021-06-13': {
     [moment().format('YYYY-MM-DD')]: {

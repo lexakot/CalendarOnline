@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "203114362283",
+    "project_id": "push-notifications-7f232",
+    "storage_bucket": "push-notifications-7f232.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:203114362283:android:686e10eb0f619206b48eee",
+        "android_client_info": {
+          "package_name": "com.calendaronline"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "203114362283-olhva5qjhekd0sq8nteakg5bf1p0b4bo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTIlOiUkewbfIPQhz0lTooxCs1LeK5M-8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "203114362283-olhva5qjhekd0sq8nteakg5bf1p0b4bo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

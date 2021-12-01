@@ -3,14 +3,26 @@ import {Keyboard, StyleSheet, Text, View} from 'react-native';
 import CountDown from 'react-native-countdown-component';
 import {connect} from 'react-redux';
 
-import {loginRequest} from '../../redux/auth';
+import {
+  loginRequest,
+  codeEnteredSuccess,
+  getProfileRequest,
+} from '../../redux/auth';
 
 import {Title, SubTitle} from '../../components/common';
 import TopBar from '../../components/TopBar';
 
 import * as S from './styled';
+import http from '../../services/http/api';
 
-const CodeConfirmScreen = ({navigation, route, code: codeFromStore, loginRequest}) => {
+const CodeConfirmScreen = ({
+  navigation,
+  route,
+  code: codeFromStore,
+  loginRequest,
+  codeEnteredSuccess,
+  getProfileRequest,
+}) => {
   const [keyboardShow, setKeyboardShow] = React.useState(false);
   const [isResendActive, setResendActive] = React.useState(false);
   const [error, setError] = React.useState(false);
@@ -31,14 +43,19 @@ const CodeConfirmScreen = ({navigation, route, code: codeFromStore, loginRequest
   const keyboardDidHide = () => setKeyboardShow(false);
   const keyboardDidShow = () => setKeyboardShow(true);
 
-  const goTabNavigation = () => {
-    console.log('codeFromStore', codeFromStore);
+  const goTabNavigation = async () => {
     if (code !== codeFromStore) {
       setError(true);
       return;
     }
+    try {
+      await http.get('/api/Profile');
+      getProfileRequest();
+      codeEnteredSuccess();
+    } catch (err) {
+      navigation.navigate('Profile');
+    }
     setError(false);
-    navigation.navigate('Tabs');
   };
 
   const resendCode = () => {
@@ -127,6 +144,8 @@ const styles = StyleSheet.create({
 
 const mapDispatchToProps = {
   loginRequest,
+  codeEnteredSuccess,
+  getProfileRequest,
 };
 
 const mapStateToProps = ({auth}) => ({

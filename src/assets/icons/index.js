@@ -16,6 +16,8 @@ import Declined from '../icons/x-circle.svg';
 import Accepted from '../icons/accepted.svg';
 import Decline from '../icons/decline.svg';
 import Accept from '../icons/accept.svg';
+import Gift from '../icons/gift.svg';
+import Phone from '../icons/phone.svg';
 
 export {
   OkIcon,
@@ -36,4 +38,6 @@ export {
   Accepted,
   Decline,
   Accept,
+  Gift,
+  Phone,
 };

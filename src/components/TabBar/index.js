@@ -34,7 +34,7 @@ const config = [
     name: 'Профиль',
     icon: <SettingsIcon />,
     activeIcon: <SettingsIcon />,
-    route: 'Contacts',
+    route: 'Settings',
     id: 3,
   },
 ];
